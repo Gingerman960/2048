@@ -1,4 +1,4 @@
-<div class="wrapper" (keydown)="gameControl($event)" tabindex="1">
+<div class="wrapper" #gameField (keydown)="gameControl($event)" tabindex="1">
     <div class="grid-container">
         <div class="grid-item" *ngFor="let item of array; let i = index">
             <div class="number-container" [ngClass]="getColour(item) + ' ' + classArray[i]">{{item}}</div>

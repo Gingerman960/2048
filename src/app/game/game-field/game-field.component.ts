@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { timeout } from 'q';
 import { isNull } from 'util';
 
@@ -7,8 +7,13 @@ import { isNull } from 'util';
   templateUrl: './game-field.component.html',
   styleUrls: ['./game-field.component.scss']
 })
+
 export class GameFieldComponent implements OnInit {
   constructor() { }
+  @ViewChild('gameField') gameField;
+  ngAfterViewInit() {
+    this.gameField.nativeElement.focus();  
+  }
 
   numberClass = {
     2: 'title-2',
@@ -32,9 +37,9 @@ export class GameFieldComponent implements OnInit {
     this.appearRandomNumber(); 
   }
   appearRandomNumber() {
-    console.log('arr ',this.array);
+    //console.log('arr ',this.array);
     let freeIndex = this.array.map((v, i) => {if(v == null) {return i;}}).filter(v => {if(v != undefined) return true;});
-    console.log('free: ', freeIndex);
+    //console.log('free: ', freeIndex);
     if(freeIndex.length >= 1) {
       let index = freeIndex[this.randomGen(freeIndex.length -1)];
       this.array[index] = this.randomGen(1) == 0 ? 2 : 4;
@@ -43,7 +48,7 @@ export class GameFieldComponent implements OnInit {
   }
   randomGen(max) {
     let temp = Math.floor(Math.random() * Math.floor(max + 1));
-    console.log(temp);
+    //console.log(temp);
     return temp;
   }
   getColour(val) {   
@@ -54,10 +59,11 @@ export class GameFieldComponent implements OnInit {
     setTimeout(() => {this.classArray[index] = '';},30);
   }
   gameControl(event: any)  {
-    console.log(event.key);
+    //console.log(event.key);
     if(event.key == 'ArrowRight') {
       this.direction = 'right';
       this.move();
+      //this.appearRandomNumber();
     // } else if(event.key == 'ArrowDown') {
     //   this.twist('right');
     //   this.move();
@@ -77,18 +83,84 @@ move() {
     chunks[2] = this.array.slice(8, 12);
     chunks[3] = this.array.slice(12, 16);
     for(let i = 0; i < chunks.length; i++) {
-      // for(let j = 0; j < chunks[i].length; j++) {
+      let freePlace = null;
+      // for(let j = chunks[i].length - 1; j >= 0; j--) {
         
       // }
-      recoursiveCalc(chunks[i], 3);
+
+      //recoursiveCalc(chunks[i], 3);
+
+      // if(chunks[i][3] == null {
+      //   if(chunks[i][2] == null) {
+      //     if(chunks[i][1] == null) {
+      //       if(chunks[i][0] == null) {
+
+      //       }
+      //     }
+      //   } else {
+
+      //   }
+      // } // else continue
+
+      for(let j = chunks[i].length-1; j >= 0; j--) {
+        //if(chunks[i][j] != null) {
+          if(j != 3) {
+            console.log('data: ', j, freePlace);
+            freePlace = makeMove(i,j,freePlace)
+          } else freePlace = 3;
+        //} else {
+          //freePlace = j;
+        //}
+      }
+
       
     }
-    function recoursiveCalc(chunks, i) { 
-      if(!isNull(chunks[i]) && i >= 0)
-      {
-        
+
+    this.array = chunks[0].concat(chunks[1], chunks[2], chunks[3]);
+    setTimeout(() => this.appearRandomNumber(), 100);
+      console.log('array', this.array)
+
+    function makeMove(i, j, freePlace) {
+      if (chunks[i][freePlace] == null) {
+        //move animation
+        chunks[i][freePlace] = chunks[i][j];
+        chunks[i][j] = null;
+        return freePlace;
+      } else if(chunks[i][j] == null) {
+        return freePlace;
+      } else if (chunks[i][freePlace] == chunks[i][j]) {
+        chunks[i][freePlace] = chunks[i][freePlace] * 2;
+        //move animation from j to freePlace, 
+        //then animation of appering new number at freePlace
+        chunks[i][j] = null;
+        return j;
       } else {
-        recoursiveCalc(chunks, i-1);
+        if(freePlace - j == 1) {
+          return j
+        } else {
+          chunks[i][freePlace - 1] = chunks[i][j];
+          //animation here please (move from j to freePlace-1)
+          chunks[i][j] = null;
+          return freePlace - 1;
+        }
       }
     }
+  }
+    // function recoursiveCalc(chunks, i) { 
+    //   if(!isNull(chunks[i]) && i >= 0)
+    //   {
+    //     if(i == 0) {
+
+    //     } else {
+    //       recoursiveCalc(chunks, i-1);
+    //     }
+        
+    //   } else {
+    //     if(i == 0) {
+
+    //     } else {
+    //       recoursiveCalc(chunks, i-1);
+    //     }
+    //   }
+    // }
 }
