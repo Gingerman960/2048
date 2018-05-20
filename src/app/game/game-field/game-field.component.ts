@@ -31,6 +31,7 @@ export class GameFieldComponent implements OnInit {
   direction = '';
   array = Array(16).fill(null);
   classArray = Array(16).fill('');
+  score = 0;
 
   ngOnInit() {
     this.appearRandomNumber(); 
@@ -42,8 +43,10 @@ export class GameFieldComponent implements OnInit {
     //console.log('free: ', freeIndex);
     if(freeIndex.length >= 1) {
       let index = freeIndex[this.randomGen(freeIndex.length -1)];
-      this.array[index] = this.randomGen(1) == 0 ? 2 : 4;
-      this.animate(index, 'appear');
+      setTimeout(() => {
+        this.array[index] = this.randomGen(1) == 0 ? 2 : 4;
+        this.animate(index, 'appear');
+      },100);
     }
   }
   randomGen(max) {
@@ -62,26 +65,21 @@ export class GameFieldComponent implements OnInit {
     //console.log(event.key);
     if(event.key == 'ArrowRight') {
       this.direction = 'right';
-      this.move();
-      //this.appearRandomNumber();
-    // } else if(event.key == 'ArrowDown') {
-    //   this.twist('right');
-    //   this.move();
-    //   this.twist('left');
-    // } else if(event.key == 'ArrowLeft') {
-    //   this.twist
-    //   this.move();
-    // } else if(event.key == 'ArrowUp') {
-    //   this.move();
-    // }
-  }
+      this.array = this.getArrFromChunks(this.move(this.getChunks()));
+      this.appearRandomNumber();
+    } else if(event.key == 'ArrowDown') {
+      this.array = this.getArrFromChunks(this.turn(this.move(this.turn(this.getChunks(),90)),-90));
+      this.appearRandomNumber();
+    } else if(event.key == 'ArrowLeft') {
+      this.array = this.getArrFromChunks(this.turn(this.move(this.turn(this.getChunks(), 180)),180));
+      this.appearRandomNumber();
+    } else if(event.key == 'ArrowUp') {
+      this.array = this.getArrFromChunks(this.turn(this.move(this.turn(this.getChunks(), -90)),90));
+      this.appearRandomNumber();
+    }
+  //}
 }
-move() {
-  let chunks = [[],[],[],[]];
-    chunks[0] = this.array.slice(0, 4);
-    chunks[1] = this.array.slice(4, 8);
-    chunks[2] = this.array.slice(8, 12);
-    chunks[3] = this.array.slice(12, 16);
+move(chunks) {
     for(let i = 0; i < chunks.length; i++) {
       let freePlace = null;
 
@@ -93,15 +91,9 @@ move() {
       } 
     }
 
-    
-      setTimeout(() => {
-        console.log('before', chunks);
-        setTimeout(() => console.log('after', chunks), 1000)
-        this.array = chunks[0].concat(chunks[1], chunks[2], chunks[3]);
-        this.appearRandomNumber()
-      }, 600);
-      //console.log('array', this.array)
-      
+      //return chunks[0].concat(chunks[1], chunks[2], chunks[3]);
+      return chunks;
+
     function makeMove(self: GameFieldComponent, i, j, freePlace) {
       if (chunks[i][freePlace] == null) {
         //move animation
@@ -113,6 +105,7 @@ move() {
       } else if(chunks[i][j] == null) {
         return freePlace;
       } else if (chunks[i][freePlace] == chunks[i][j]) {
+        self.score += chunks[i][freePlace];
         chunks[i][freePlace] = chunks[i][freePlace] * 2;
         //move animation from j to freePlace, 
         //self.moveAnimation(i, j, freePlace).then(() => {
@@ -136,6 +129,42 @@ move() {
       }
     }
   }
+  getChunks() {
+    let chunks = [[],[],[],[]];
+    chunks[0] = this.array.slice(0, 4);
+    chunks[1] = this.array.slice(4, 8);
+    chunks[2] = this.array.slice(8, 12);
+    chunks[3] = this.array.slice(12, 16);
+    return chunks;
+  }
+  getArrFromChunks(chunks) {
+    return chunks[0].concat(chunks[1], chunks[2], chunks[3]);
+  }
+  turn(m, degree) {
+    let n = m.slice();
+    console.log('matrix',n);
+    //console.log('original',m);
+    if(degree == 90) {
+      return n[0].map((column, index) => (
+        n.map(row => row[index])
+      )).reverse();
+    } else if(degree == -90) {
+      n = n.reverse();
+      return n[0].map((column, index) => (
+        n.map(row => row[index])
+      ));
+    } else if(degree == 180){
+      // n = n.reverse();
+      // return n[0].map((column, index) => (
+      //   n.map(row => row[index])
+      // )).reverse();
+      n.reverse();
+      n.forEach(element => {
+        element.reverse();
+      });
+      return n;
+    }
+  } 
   moveAnimation(row, from, to) {
     return new Promise((resolve, reject) => {
       this.classArray[row * 4 + from] = `move-${this.direction}-${to - from}`;
@@ -161,6 +190,6 @@ move() {
     });
   }
   getScore() {
-    return this.array.reduce((res, n) => {return res + n});
+    return this.score;
   }
 }
