@@ -2,6 +2,36 @@
     margin: 0 auto;
     font-family: 'Oswald', sans-serif;
     display: grid;
+    .content {
+        text-transform: uppercase;
+        width: 450px;
+        margin: 20px 0;
+        color: #faf8ef;
+        display: flex;
+        justify-self: center;
+        justify-content: space-between;
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            width: 100px;
+            background: #776e65;
+            border-radius: 5px;
+            margin: 0 10px;
+            &.head {
+                font-size: 30px;
+            }
+            &.score {
+                font-size: 18px;
+            }
+        }
+        &.text {
+            color: #776e65;
+            justify-content: center;
+        }
+    }
     .grid-container {
         padding: 10px;
         border-radius: 5px;
@@ -39,7 +69,7 @@
                 &.displayNone {
                     display: none;
                 }
-                &.move-right {
+                &.move-right-1 {
                     transform: translateX(110%);
                 }
                 &.move-right-2 {

@@ -84,83 +84,83 @@ move() {
     chunks[3] = this.array.slice(12, 16);
     for(let i = 0; i < chunks.length; i++) {
       let freePlace = null;
-      // for(let j = chunks[i].length - 1; j >= 0; j--) {
-        
-      // }
-
-      //recoursiveCalc(chunks[i], 3);
-
-      // if(chunks[i][3] == null {
-      //   if(chunks[i][2] == null) {
-      //     if(chunks[i][1] == null) {
-      //       if(chunks[i][0] == null) {
-
-      //       }
-      //     }
-      //   } else {
-
-      //   }
-      // } // else continue
 
       for(let j = chunks[i].length-1; j >= 0; j--) {
-        //if(chunks[i][j] != null) {
-          if(j != 3) {
-            console.log('data: ', j, freePlace);
-            freePlace = makeMove(i,j,freePlace)
-          } else freePlace = 3;
-        //} else {
-          //freePlace = j;
-        //}
-      }
-
-      
+        if(j != 3) {
+          //console.log('data: ', j, freePlace);
+          freePlace = makeMove(this, i,j,freePlace)
+        } else freePlace = 3;
+      } 
     }
 
-    this.array = chunks[0].concat(chunks[1], chunks[2], chunks[3]);
-    setTimeout(() => this.appearRandomNumber(), 100);
-      console.log('array', this.array)
-
-    function makeMove(i, j, freePlace) {
+    
+      setTimeout(() => {
+        console.log('before', chunks);
+        setTimeout(() => console.log('after', chunks), 1000)
+        this.array = chunks[0].concat(chunks[1], chunks[2], chunks[3]);
+        this.appearRandomNumber()
+      }, 600);
+      //console.log('array', this.array)
+      
+    function makeMove(self: GameFieldComponent, i, j, freePlace) {
       if (chunks[i][freePlace] == null) {
         //move animation
-        chunks[i][freePlace] = chunks[i][j];
-        chunks[i][j] = null;
-        return freePlace;
+        //self.moveAnimation(i, j, freePlace).then(()=> {
+          chunks[i][freePlace] = chunks[i][j];
+          chunks[i][j] = null;
+          return freePlace;
+        //});
       } else if(chunks[i][j] == null) {
         return freePlace;
       } else if (chunks[i][freePlace] == chunks[i][j]) {
         chunks[i][freePlace] = chunks[i][freePlace] * 2;
         //move animation from j to freePlace, 
+        //self.moveAnimation(i, j, freePlace).then(() => {
         //then animation of appering new number at freePlace
-        chunks[i][j] = null;
-        return j;
+          //self.appearAnimation(i, freePlace).then(()=> {
+            chunks[i][j] = null;
+            return j;
+          //});
+        //});
       } else {
         if(freePlace - j == 1) {
           return j
         } else {
-          chunks[i][freePlace - 1] = chunks[i][j];
           //animation here please (move from j to freePlace-1)
-          chunks[i][j] = null;
-          return freePlace - 1;
+          //self.moveAnimation(i, j, freePlace-1).then(()=>{
+            chunks[i][freePlace - 1] = chunks[i][j];
+            chunks[i][j] = null;
+            return freePlace - 1;
+          //});
         }
       }
     }
   }
-    // function recoursiveCalc(chunks, i) { 
-    //   if(!isNull(chunks[i]) && i >= 0)
-    //   {
-    //     if(i == 0) {
-
-    //     } else {
-    //       recoursiveCalc(chunks, i-1);
-    //     }
-        
-    //   } else {
-    //     if(i == 0) {
-
-    //     } else {
-    //       recoursiveCalc(chunks, i-1);
-    //     }
-    //   }
-    // }
+  moveAnimation(row, from, to) {
+    return new Promise((resolve, reject) => {
+      this.classArray[row * 4 + from] = `move-${this.direction}-${to - from}`;
+      setTimeout(() => {
+        this.classArray[row * 4 + from] = 'displayNone';
+        setTimeout(()=> {
+          this.classArray[row * 4 + from] = '';
+        resolve;
+        }, 300);
+      }, 300);
+    })
+  }
+  appearAnimation(row, to) {
+    return new Promise((resolve, reject) => {
+      this.classArray[row * 4 + to] = 'appear';
+      setTimeout(() => {
+        this.classArray[row * 4 + to] = 'displayNone';
+        setTimeout(() => {
+          this.classArray[row * 4 + to] = '';
+          resolve;
+        });
+      }, 300);
+    });
+  }
+  getScore() {
+    return this.array.reduce((res, n) => {return res + n});
+  }
 }
