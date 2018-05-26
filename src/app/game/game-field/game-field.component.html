@@ -8,12 +8,12 @@
             <div>{{getScore()}}</div>
         </div>
     </div>
-    <div class="grid-container">
-        <div class="grid-item" *ngFor="let item of array; let i = index">
-            <div class="number-container" [ngClass]="getColour(item) + ' ' + classArray[i]">{{item}}</div>
+    <div class="grid-container" (touchstart)="handleTouchStart($event)" (touchmove)="handleTouchMove($event)">
+        <div class="grid-item " *ngFor="let item of array; let i=i ndex ">
+            <div class="number-container " [ngClass]="getColour(item) + ' ' + classArray[i] ">{{item}}</div>
         </div>
     </div>
-    <div class="content text">
-        <div>Use arrow keys to play</div>
+    <div class="content text ">
+        <div>Use arrow keys or swipe to play</div>
     </div>
 </div>

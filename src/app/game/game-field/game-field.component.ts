@@ -62,22 +62,36 @@ export class GameFieldComponent implements OnInit {
     setTimeout(() => {this.classArray[index] = '';},30);
   }
   gameControl(event: any)  {
-    //console.log(event.key);
     if(event.key == 'ArrowRight') {
-      this.direction = 'right';
-      this.array = this.getArrFromChunks(this.move(this.getChunks()));
-      this.appearRandomNumber();
+      this.controlRight();
     } else if(event.key == 'ArrowDown') {
-      this.array = this.getArrFromChunks(this.turn(this.move(this.turn(this.getChunks(),90)),-90));
-      this.appearRandomNumber();
+      this.controlDown();
     } else if(event.key == 'ArrowLeft') {
-      this.array = this.getArrFromChunks(this.turn(this.move(this.turn(this.getChunks(), 180)),180));
-      this.appearRandomNumber();
+      this.controlLeft();
     } else if(event.key == 'ArrowUp') {
-      this.array = this.getArrFromChunks(this.turn(this.move(this.turn(this.getChunks(), -90)),90));
-      this.appearRandomNumber();
+      this.controlUp();
     }
   //}
+}
+controlRight() {
+  this.direction = 'right';
+  this.array = this.getArrFromChunks(this.move(this.getChunks()));
+  this.appearRandomNumber();
+}
+controlLeft() {
+  this.direction = 'left';
+  this.array = this.getArrFromChunks(this.turn(this.move(this.turn(this.getChunks(), 180)), 180));
+  this.appearRandomNumber();
+}
+controlDown() {
+  this.direction = 'down';
+  this.array = this.getArrFromChunks(this.turn(this.move(this.turn(this.getChunks(), 90)), -90));
+  this.appearRandomNumber();
+}
+controlUp() {
+  this.direction = 'up';
+  this.array = this.getArrFromChunks(this.turn(this.move(this.turn(this.getChunks(), -90)), 90));
+  this.appearRandomNumber();
 }
 move(chunks) {
     for(let i = 0; i < chunks.length; i++) {
@@ -192,4 +206,48 @@ move(chunks) {
   getScore() {
     return this.score;
   }
+  xDown = null;                                                        
+  yDown = null;  
+
+  handleTouchStart(evt) {
+    this.xDown = evt.touches[0].clientX;
+    this.yDown = evt.touches[0].clientY;
+  };
+
+  handleTouchMove(evt) {
+    if (!this.xDown || !this.yDown) {
+      return;
+    }
+
+    var xUp = evt.touches[0].clientX;
+    var yUp = evt.touches[0].clientY;
+
+    var xDiff = this.xDown - xUp;
+    var yDiff = this.yDown - yUp;
+
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {/*most significant*/
+      if (xDiff > 0) {
+        /* left swipe */
+        console.log('left swipe');
+        this.controlLeft();
+      } else {
+        /* right swipe */
+        console.log('right swipe');
+        this.controlRight();
+      }
+    } else {
+      if (yDiff > 0) {
+        /* up swipe */
+        console.log('up swipe');
+        this.controlUp();
+      } else {
+        /*down swipe */
+        console.log('down swipe');
+        this.controlDown();
+      }
+    }
+    /* reset values */
+    this.xDown = null;
+    this.yDown = null;
+  };
 }
